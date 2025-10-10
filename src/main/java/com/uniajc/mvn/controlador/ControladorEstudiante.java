@@ -21,6 +21,9 @@ public class ControladorEstudiante {
     public void agregarEstudiante(Estudiante estudiante) {
         this.estudiantes.add(estudiante);
     }
+    public List<Estudiante> listarTodosLosEstudiantes() {
+    return Estudiante.obtenerTodosLosEstudiantes();
+  }
 
    
 }
