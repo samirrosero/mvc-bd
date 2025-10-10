@@ -50,11 +50,11 @@ public class Profesor {
         this.correo_electronico = correo_electronico;
     }
 
-    // CRUD
+   // INSERT
     public static void insertarProfesor(Profesor profesor) {
         String sql = "INSERT INTO profesor (id_profesor, nombre, materia, correo_electronico) VALUES (?, ?, ?, ?)";
-        try (Connection conn = ConexionDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conexion = ConexionDatabase.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, profesor.getIdProfesor());
             ps.setString(2, profesor.getNombre());
             ps.setString(3, profesor.getMateria());
@@ -62,36 +62,14 @@ public class Profesor {
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error al insertar profesor: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    public static List<Profesor> obtenerTodosLosProfesores() {
-        List<Profesor> lista = new ArrayList<>();
-        String sql = "SELECT * FROM profesor";
-        try (Connection conn = ConexionDatabase.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                Profesor p = new Profesor(
-                        rs.getInt("id_profesor"), 
-                        rs.getString("nombre"),
-                        rs.getString("materia"),
-                        rs.getString("correo_electronico")
-                );
-                lista.add(p);
-            }
-        } catch (Exception e) {
-            System.out.println("Error al obtener profesores: " + e.getMessage());
-        }
-        return lista;
-    }
-
-
+    // UPDATE
     public static void actualizarProfesor(Profesor profesor) {
-        String sql = "UPDATE profesor SET nombre = ?, materia = ?, correo_electronico = ? WHERE id_profesor = ?";
-        try (Connection conn = ConexionDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "UPDATE profesor SET nombre=?, materia=?, correo_electronico=? WHERE id_profesor=?";
+        try (Connection conexion = ConexionDatabase.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, profesor.getNombre());
             ps.setString(2, profesor.getMateria());
             ps.setString(3, profesor.getCorreoElectronico());
@@ -99,20 +77,60 @@ public class Profesor {
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error al actualizar profesor: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
+    // DELETE
     public static void eliminarProfesor(int idProfesor) {
-        String sql = "DELETE FROM profesor WHERE id_profesor = ?";
-        try (Connection conn = ConexionDatabase.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "DELETE FROM profesor WHERE id_profesor=?";
+        try (Connection conexion = ConexionDatabase.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idProfesor);
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error al eliminar profesor: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
+    // SELECT (buscar por ID)
+    public static Profesor buscarPorId(int idProfesor) {
+        String sql = "SELECT * FROM profesor WHERE id_profesor=?";
+        try (Connection conexion = ConexionDatabase.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idProfesor);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Profesor(
+                    rs.getInt("id_profesor"),
+                    rs.getString("nombre"),
+                    rs.getString("materia"),
+                    rs.getString("correo_electronico")
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("Error al buscar profesor: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // SELECT (todos)
+    public static List<Profesor> obtenerTodosLosProfesores() {
+        List<Profesor> profesores = new ArrayList<>();
+        String sql = "SELECT * FROM profesor";
+        try (Connection conexion = ConexionDatabase.getConnection();
+             Statement st = conexion.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                profesores.add(new Profesor(
+                    rs.getInt("id_profesor"),
+                    rs.getString("nombre"),
+                    rs.getString("materia"),
+                    rs.getString("correo_electronico")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("Error al obtener profesores: " + e.getMessage());
+        }
+        return profesores;
+    }
 }
