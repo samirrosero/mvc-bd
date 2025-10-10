@@ -7,22 +7,22 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 
 public class Estudiante {
-    private int id;
+    private int id_estudiante;
     private String nombre;
     private int edad;
 
-    public Estudiante(int id, String nombre, int edad) {
-        this.id = id;
+    public Estudiante(int id_estudiante, String nombre, int edad) {
+        this.id_estudiante = id_estudiante;
         this.nombre = nombre;
         this.edad = edad;
     }
 
     public int getId() {
-        return this.id;
+        return this.id_estudiante;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int id_estudiante) {
+        this.id_estudiante = id_estudiante;
     }
 
      public Estudiante(String nombre, int edad) {
@@ -92,6 +92,42 @@ public class Estudiante {
     }
 
     return estudiantes;
+  }
+
+  public static void actualizarEstudiante(Estudiante estudiante) {
+    String sql = "UPDATE estudiante SET nombre = ?, edad = ? WHERE id = ?";
+
+    try {
+      Connection conexion = ConexionDatabase.getConnection();
+
+      PreparedStatement preparedStatement = conexion.prepareStatement(sql);
+      preparedStatement.setString(1, estudiante.getNombre());
+      preparedStatement.setInt(2, estudiante.getEdad());
+      preparedStatement.setInt(3, estudiante.getId());
+
+      // Ejecutar la sentencias SQL INSERT, UPDATE o DELETE
+      preparedStatement.executeUpdate();
+    } catch (Exception e) {
+      System.out.println("Error al actualizar el estudiante: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  public static void eliminarEstudiante(int id_estudiante) {
+    String sql = "DELETE FROM estudiante WHERE id = ?";
+
+    try {
+      Connection conexion = ConexionDatabase.getConnection();
+
+      PreparedStatement preparedStatement = conexion.prepareStatement(sql);
+      preparedStatement.setInt(1, id_estudiante);
+
+      // Ejecutar la sentencias SQL INSERT, UPDATE o DELETE
+      preparedStatement.executeUpdate();
+    } catch (Exception e) {
+      System.out.println("Error al eliminar el estudiante: " + e.getMessage());
+      e.printStackTrace();
+    }
   }
 
 }
