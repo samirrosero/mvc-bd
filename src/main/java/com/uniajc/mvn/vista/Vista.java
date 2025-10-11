@@ -18,17 +18,12 @@ public class Vista {
              
     });
     }
-
-    public void mostrarDetallesCurso(List<Curso> curso) {
-        /*for (Estudiante curso : cursos) {
-            System.out.println("Detalles del Curso:");
-            System.out.println("Nombre: " + curso.getNombre());
-            System.out.println("Edad: " + curso.getEdad());
-        }*/
-        curso.forEach(cursos -> {
+    public void mostrarDetallesCurso(List<Curso> cursos) {
+        cursos.forEach(curso -> {
             System.out.println("Imprimiendo desde la vista: ");
-         // System.out.println("Nombre: " + estudiante.getNombre() + " - " + "Edad: " + estudiante.getEdad());  
-        });        
+         // System.out.println("Nombre: " + estudiante.getNombre() + " - " + "Edad: " + estudiante.getEdad());
+              
+     });
     }
     
 
