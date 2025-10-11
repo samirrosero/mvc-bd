@@ -1,30 +1,33 @@
 package com.uniajc.mvn;
 
 import java.sql.Connection;
-import java.util.Scanner;
-import com.uniajc.mvn.controlador.ControladorEstudiante;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import com.uniajc.mvn.modelo.ConexionDatabase;
-import com.uniajc.mvn.modelo.Estudiante;
-import com.uniajc.mvn.vista.Vista;
+import com.uniajc.mvn.vista.MenuPrincipalFrame;
 
 public class Main {
- public static void main(String[] args) throws Exception {
 
-        Connection conexion= ConexionDatabase.getConnection();
-       /*  Scanner scanner = new Scanner(System.in);
-        Estudiante modelo = new Estudiante("", 0);
-        Vista vista = new Vista();
-        ControladorEstudiante controlador = new ControladorEstudiante(modelo, vista);
+    public static void main(String[] args) {
+        Connection conexion = null;
 
-        System.out.print("Ingrese el nombre del estudiante: ");
-        String nombre = scanner.nextLine();
+        try {
+            conexion = ConexionDatabase.getConnection();
+            if (conexion != null) {
+                System.out.println("✅ Conexión exitosa a la base de datos.");
+            } else {
+                JOptionPane.showMessageDialog(null, "❌ No se pudo establecer conexión con la base de datos.");
+                return;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
 
-        System.out.print("Ingrese la edad del estudiante: ");
-        int edad = scanner.nextInt();
-
-        Estudiante estudiante = new Estudiante(nombre, edad);
-        controlador.agregarEstudiante(estudiante);
-        controlador.actualizarVista();
-        scanner.close(); */
+        // Abre el menú principal
+        SwingUtilities.invokeLater(() -> {
+            new MenuPrincipalFrame().setVisible(true);
+        });
     }
 }

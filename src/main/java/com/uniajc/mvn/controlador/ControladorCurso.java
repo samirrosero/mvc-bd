@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.uniajc.mvn.modelo.Curso;
-import com.uniajc.mvn.vista.Vista;
+import com.uniajc.mvn.vista.VistaCurso;
 
 public class ControladorCurso {
     private List<Curso> curso;
-    public Vista vista;
+    public VistaCurso vista;
 
-    public ControladorCurso(Curso modelo, Vista vista) {
+    public ControladorCurso(Curso modelo, VistaCurso vista) {
         this.vista = vista;
         this.curso = new ArrayList<Curso>();
 

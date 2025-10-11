@@ -3,14 +3,14 @@ package com.uniajc.mvn.controlador;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.uniajc.mvn.vista.Vista;
+import com.uniajc.mvn.vista.VistaEstudiante;
 import com.uniajc.mvn.modelo.Estudiante;
 
 public class ControladorEstudiante {
     private List<Estudiante> estudiantes;
-    private Vista vista;
+    private VistaEstudiante vista;
 
-    public ControladorEstudiante(Estudiante modelo, Vista vista) {
+    public ControladorEstudiante(Estudiante modelo, VistaEstudiante vista) {
         this.vista = vista;
         this.estudiantes = new ArrayList<Estudiante>();
 
