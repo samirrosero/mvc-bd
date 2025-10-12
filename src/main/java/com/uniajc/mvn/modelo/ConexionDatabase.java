@@ -4,6 +4,7 @@ package com.uniajc.mvn.modelo;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +41,15 @@ public class ConexionDatabase {
         return connection;
     }
 
+        public static Statement getInstance() {
+        try {
+            return getConnection().createStatement();
+        } catch (SQLException e) {
+            System.out.println("Error al crear el Statement: " + e.getMessage());
+            return null;
+        }
+    }
+
     public static void closeConnection() {
         if (connection != null) {
             try {
@@ -50,5 +60,6 @@ public class ConexionDatabase {
                 }
             }
         }
-    }
+
+}
 
