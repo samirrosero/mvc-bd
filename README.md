@@ -1,109 +1,113 @@
-# practica-mvn-mvc-bd
+# Sistema de Gestión Académica
 
-Descripcion breve
+## Descripción
 
-Proyecto Java Maven (MVC) que usa un archivo `config.properties` en la raíz para leer los datos de conexión a la base de datos.
+Este es un proyecto de escritorio desarrollado en Java con Swing que implementa el patrón de diseño Modelo-Vista-Controlador (MVC). La aplicación permite gestionar entidades académicas como Estudiantes, Profesores y Cursos, interactuando con una base de datos MySQL.
 
-## Uso de `config.properties`
+El proyecto está construido con Maven para la gestión de dependencias y del ciclo de vida de la compilación.
 
-- Ubicación: el archivo `config.properties` debe estar en el directorio de trabajo (working directory) desde donde se ejecuta la aplicación. Si ejecutas el JAR con `java -jar target/practica-mvn-mvc-bd-1.0-SNAPSHOT.jar`, coloca `config.properties` en la misma carpeta donde ejecutas el comando (normalmente junto al JAR).
+## Características
 
-- Formato: es un archivo Java properties con pares clave=valor. Ejemplo recomendado:
+- **Gestión de Estudiantes**: Permite agregar, actualizar, eliminar y listar estudiantes.
+- **Gestión de Profesores**: Permite agregar, actualizar, eliminar y listar profesores.
+- **Gestión de Cursos**: Permite asignar profesores y estudiantes a cursos, así como realizar operaciones CRUD sobre ellos.
+- **Interfaz Gráfica de Usuario (GUI)**: Desarrollada con Java Swing para una interacción intuitiva.
+- **Conexión a Base de Datos**: Configuración de la conexión a MySQL a través de un archivo externo `config.properties`.
 
+## Tecnologías Utilizadas
+
+- **Lenguaje**: Java 17
+- **Librería Gráfica**: Java Swing
+- **Gestor de Dependencias**: Apache Maven
+- **Base de Datos**: MySQL
+- **Driver**: MySQL Connector/J
+
+## Prerrequisitos
+
+- **JDK 17** o superior.
+- **Apache Maven** 3.6 o superior.
+- Un servidor de **MySQL** en ejecución.
+
+## Configuración del Proyecto
+
+### 1. Base de Datos
+
+Primero, crea una base de datos en tu servidor MySQL. Puedes usar el siguiente script SQL para crear la base de datos y las tablas necesarias.
+
+```sql
+CREATE DATABASE IF NOT EXISTS practica_mvn_mvc_bd;
+USE practica_mvn_mvc_bd;
+
+CREATE TABLE estudiante (
+    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    edad INT
+);
+
+CREATE TABLE profesor (
+    id_profesor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    materia VARCHAR(255),
+    correo_electronico VARCHAR(255) UNIQUE
+);
+
+CREATE TABLE curso (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_curso VARCHAR(255) NOT NULL,
+    id_profesor INT,
+    id_estudiante INT,
+    FOREIGN KEY (id_profesor) REFERENCES profesor(id_profesor) ON DELETE SET NULL,
+    FOREIGN KEY (id_estudiante) REFERENCES estudiante(id_estudiante) ON DELETE CASCADE
+);
 ```
-# config.properties (ejemplo)
+
+### 2. Archivo de Configuración
+
+Crea un archivo llamado `config.properties` en la raíz del proyecto con tus credenciales de la base de datos.
+
+**`config.properties`**
+```properties
+# Configuración de la conexión a la base de datos
 URL=jdbc:mysql://localhost:3306/practica_mvn_mvc_bd
 USER=root
-PASSWORD=TU_PASSWORD
+PASSWORD=tu_contraseña_secreta
 ```
 
-Nota: en tu repositorio actual `config.properties` contiene:
+> **Importante**: Este archivo debe estar en el directorio de trabajo desde donde se ejecuta la aplicación. Si ejecutas desde un IDE, la raíz del proyecto suele ser el directorio de trabajo por defecto.
 
-```
-URL =jdbc:mysql://localhost:3306/practica_mvn_mvc_bd
-USER =root
-PASSWORD =1234567890
-```
+## Cómo Ejecutar la Aplicación
 
-Las diferencias de espacios alrededor del `=` no impiden que `Properties.load(...)` funcione, pero es más limpio no usar espacios.
+Puedes ejecutar la aplicación desde la línea de comandos usando Maven o directamente desde tu IDE preferido (IntelliJ, Eclipse, etc.).
 
-## Cómo lo usa el código
+### Desde la Línea de Comandos
 
-La clase `com.uniajc.mvn.modelo.ConexionDatabase` carga el archivo con:
+1.  Abre una terminal en la raíz del proyecto.
+2.  Compila el proyecto y empaquétalo en un archivo JAR:
+    ```bash
+    mvn clean package
+    ```
+3.  Ejecuta el archivo JAR generado. Asegúrate de que `config.properties` esté en el mismo directorio desde donde ejecutas el comando.
+    ```bash
+    java -jar target/practica-mvn-mvc-bd-1.0-SNAPSHOT.jar
+    ```
 
-```java
-properties.load(new FileInputStream(new File("config.properties")));
-```
+### Desde un IDE
 
-Esto significa que la ruta es relativa al directorio de trabajo. Si el archivo no se encuentra, la aplicación captura `FileNotFoundException` (en el código actual esa excepción está silenciosa), por lo que puede no mostrarse un mensaje claro si falta el archivo.
+1.  Importa el proyecto como un proyecto Maven.
+2.  Asegúrate de que el archivo `config.properties` se encuentra en la raíz del proyecto.
+3.  Busca la clase `com.uniajc.mvn.Main` y ejecútala.
 
-También se intenta cargar el driver MySQL con:
+## Estructura del Proyecto
 
-```java
-Class.forName("com.mysql.cj.jdbc.Driver");
-```
+El código fuente está organizado en paquetes siguiendo el patrón MVC:
 
-Si ves "Error al cargar el driver de MySQL", revisa que la dependencia `mysql-connector-java` esté presente en el `pom.xml`.
+- `com.uniajc.mvn`: Contiene la clase principal `Main`.
+- `com.uniajc.mvn.modelo`: Clases del modelo de datos (`Estudiante`, `Profesor`, `Curso`), clases DAO (`EstudianteDao`, `ProfesorDao`) y la gestión de la conexión (`ConexionDatabase`).
+- `com.uniajc.mvn.controlador`: Clases controladoras que actúan como intermediarias entre la vista y el modelo.
+- `com.uniajc.mvn.vista`: Clases de la interfaz gráfica de usuario (vistas) construidas con Swing.
 
-## Ejecutar (PowerShell)
+## Buenas Prácticas y Seguridad
 
-1) Compilar y crear el JAR:
+- **No subir credenciales a repositorios**: Es una mala práctica subir el archivo `config.properties` con contraseñas a un repositorio de código como Git. Para evitarlo, puedes añadir `config.properties` a tu archivo `.gitignore`.
 
-```powershell
-mvn clean package
-```
-
-2) Coloca `config.properties` en el mismo directorio donde ejecutarás el JAR (por ejemplo en la raíz del proyecto o en `target/` junto al JAR). Luego ejecuta:
-
-```powershell
-cd target
-java -jar practica-mvn-mvc-bd-1.0-SNAPSHOT.jar
-```
-
-O desde la raíz del proyecto (si config.properties está en la raíz):
-
-```powershell
-mvn clean package; java -jar target/practica-mvn-mvc-bd-1.0-SNAPSHOT.jar
-```
-
-Si ejecutas desde tu IDE (Eclipse, IntelliJ), asegúrate de que la configuración de Run tenga el directorio de trabajo apuntando a la carpeta que contiene `config.properties`.
-
-## Seguridad y buenas prácticas
-
-- No guardes contraseñas en texto plano en repositorios públicos. Usa variables de entorno, un archivo de configuración fuera del control de versiones, o un sistema de secretos.
-- Para evitar que `config.properties` se suba al repositorio, añade una entrada a `.gitignore` (por ejemplo `config.properties`) y mantén un `config.properties.example` con valores de ejemplo.
-
-Ejemplo `.gitignore` (añade en la raíz):
-
-```
-# Ignorar configuración local con credenciales
-config.properties
-```
-
-- Alternativa segura: leer la contraseña desde una variable de entorno y usarla si existe, cayendo al `config.properties` como fallback.
-
-## Solución de problemas comunes
-
-- Aviso "intentando conectar..." seguido de "Error al conectar a la base de datos: ...": revisa la URL, usuario y contraseña. Asegúrate de que MySQL esté en ejecución y que la base de datos `practica_mvn_mvc_bd` exista.
-- Si aparece "Error al cargar el driver de MySQL": añade dependencia en `pom.xml`:
-
-```xml
-<dependency>
-  <groupId>mysql</groupId>
-  <artifactId>mysql-connector-java</artifactId>
-  <version>8.0.33</version>
-</dependency>
-```
-
-- Si el archivo `config.properties` no se encuentra: coloca el archivo en el directorio desde el que ejecutas la aplicación o modifica el código para cargarlo desde un recurso del classpath.
-
-## Mejora sugerida (opcional)
-
-Cambiar `ConexionDatabase` para que primero busque variables de entorno y si no existen, lea `config.properties`. También se puede mostrar un mensaje claro cuando `config.properties` no existe (actualmente la excepción está comentada).
-
-Si quieres, puedo:
-- Crear un `config.properties.example` con valores de ejemplo.
-- Añadir `config.properties` a `.gitignore`.
-- Modificar `ConexionDatabase` para mejorar manejo de errores y soporte de variables de entorno.
-
-Indícame cuál de estas acciones quieres que haga y lo implemento.
+- **Manejo de recursos**: Es fundamental cerrar siempre los recursos de la base de datos (`Connection`, `Statement`, `ResultSet`) para evitar fugas de recursos. El uso de bloques `try-with-resources` es la forma recomendada de hacerlo.
