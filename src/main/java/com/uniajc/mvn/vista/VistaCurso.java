@@ -1,7 +1,8 @@
 package com.uniajc.mvn.vista;
 
-import com.uniajc.mvn.modelo.Curso;
-import com.uniajc.mvn.controlador.ControladorCurso;
+import com.uniajc.mvn.modelo.*;
+import com.uniajc.mvn.controlador.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -9,43 +10,48 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 
 public class VistaCurso extends JFrame {
-    private ControladorCurso controlador;
-    private JTextField txtIdCurso, txtCurso, txtIdProfesor, txtIdEstudiante;
+    private final ControladorCurso controladorCurso;
+    private final ControladorProfesor controladorProfesor;
+    private final EstudianteController controladorEstudiante;
+
+    private JTextField txtCurso;
+    private JComboBox<Profesor> comboProfesor;
+    private JComboBox<Estudiante> comboEstudiante;
     private JTable tabla;
     private DefaultTableModel modeloTabla;
-    private int idSeleccionado = -1; // Guardará el ID del curso seleccionado
+    private int idSeleccionado = -1;
 
     public VistaCurso() {
-        controlador = new ControladorCurso();
+        controladorCurso = new ControladorCurso();
+        controladorProfesor = new ControladorProfesor();
+        controladorEstudiante = new EstudianteController();
+
         setTitle("Gestión de Cursos");
-        setSize(600, 400);
+        setSize(750, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
         JLabel titulo = new JLabel("Gestión de Cursos", SwingConstants.CENTER);
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         add(titulo, BorderLayout.NORTH);
 
-        JPanel panelForm = new JPanel(new GridLayout(4, 2, 10, 10));
+        // --- FORMULARIO ---
+        JPanel panelForm = new JPanel(new GridLayout(3, 2, 10, 10));
         panelForm.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
 
-        txtIdCurso = new JTextField();
         txtCurso = new JTextField();
-        txtIdProfesor = new JTextField();
-        txtIdEstudiante = new JTextField();
+        comboProfesor = new JComboBox<>();
+        comboEstudiante = new JComboBox<>();
 
-        panelForm.add(new JLabel("ID Curso:"));
-        panelForm.add(txtIdCurso);
-        panelForm.add(new JLabel("Nombre Curso:"));
+        panelForm.add(new JLabel("Nombre del Curso:"));
         panelForm.add(txtCurso);
-        panelForm.add(new JLabel("ID Profesor:"));
-        panelForm.add(txtIdProfesor);
-        panelForm.add(new JLabel("ID Estudiante:"));
-        panelForm.add(txtIdEstudiante);
+        panelForm.add(new JLabel("Profesor (ID - Nombre - Materia):"));
+        panelForm.add(comboProfesor);
+        panelForm.add(new JLabel("Estudiante (ID - Nombre):"));
+        panelForm.add(comboEstudiante);
 
-        // Panel de botones
+        // --- BOTONES ---
         JPanel panelBotones = new JPanel();
         JButton btnAgregar = new JButton("Agregar");
         JButton btnActualizar = new JButton("Actualizar");
@@ -55,68 +61,80 @@ public class VistaCurso extends JFrame {
         panelBotones.add(btnActualizar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnListar);
-        // Tabla
-        modeloTabla = new DefaultTableModel(new String[] { "ID", "Curso", "ID Profesor" }, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // no editable
-            }
-        };
+
+        // --- TABLA ---
+        modeloTabla = new DefaultTableModel(new String[]{"ID", "Curso", "Profesor", "Estudiante"}, 0);
         tabla = new JTable(modeloTabla);
         JScrollPane scroll = new JScrollPane(tabla);
-        // Layout general
-        JPanel panelPrincipal = new JPanel ();
+
+        JPanel panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
         panelPrincipal.add(panelForm);
         panelPrincipal.add(panelBotones);
         panelPrincipal.add(scroll);
         add(panelPrincipal, BorderLayout.CENTER);
-        // Eventos de botones
+
+        // --- EVENTOS ---
+        cargarProfesores();
+        cargarEstudiantes();
         btnAgregar.addActionListener(e -> agregarCurso());
         btnListar.addActionListener(e -> listarCursos());
         btnActualizar.addActionListener(e -> actualizarCurso());
         btnEliminar.addActionListener(e -> eliminarCurso());
+
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
                 if (fila >= 0) {
-                    idSeleccionado = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
-                    txtIdCurso.setText(modeloTabla.getValueAt(fila, 0).toString());
+                    idSeleccionado = (int) modeloTabla.getValueAt(fila, 0);
                     txtCurso.setText(modeloTabla.getValueAt(fila, 1).toString());
-                    txtIdProfesor.setText(modeloTabla.getValueAt(fila, 2).toString());
-                    // txtIdEstudiante.setText(modeloTabla.getValueAt(fila, 3).toString());
                 }
             }
         });
-
     }
+
+    private void cargarProfesores() {
+        comboProfesor.removeAllItems();
+        ArrayList<Profesor> lista = controladorProfesor.listarProfesores();
+        for (Profesor p : lista) comboProfesor.addItem(p);
+    }
+
+    private void cargarEstudiantes() {
+        comboEstudiante.removeAllItems();
+        ArrayList<Estudiante> lista = controladorEstudiante.listarEstudiantes();
+        for (Estudiante e : lista) comboEstudiante.addItem(e);
+    }
+
     private void agregarCurso() {
-        try {
-            String curso = txtCurso.getText().trim();
-            int id_profesor = Integer.parseInt(txtIdProfesor.getText().trim());
-            int id_estudiante = Integer.parseInt(txtIdEstudiante.getText().trim());
-            if (curso.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre del curso no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            boolean exito = controlador.agregarCurso(curso, id_profesor, id_estudiante);
-            if (exito) {
-                JOptionPane.showMessageDialog(this, "Curso agregado exitosamente.");
-                limpiarCampos();
-                listarCursos();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al agregar el curso.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "ID Profesor y ID Estudiante deben ser números válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+        String nombreCurso = txtCurso.getText().trim();
+        Profesor profesor = (Profesor) comboProfesor.getSelectedItem();
+        Estudiante estudiante = (Estudiante) comboEstudiante.getSelectedItem();
+
+        if (nombreCurso.isEmpty() || profesor == null || estudiante == null) {
+            JOptionPane.showMessageDialog(this, "Complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean exito = controladorCurso.agregarCurso(nombreCurso, profesor.getId(), estudiante.getId());
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "Curso agregado correctamente.");
+            limpiarCampos();
+            listarCursos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al agregar el curso.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void listarCursos() {
-        modeloTabla.setRowCount(0); // Limpiar tabla
-        ArrayList<Curso> cursos = (ArrayList<Curso>) controlador.listarCursos();
-        for (Curso curso : cursos) {
-            modeloTabla.addRow(new Object[] { curso.getIdCurso(), curso.getCurso(), curso.getIdProfesor(), curso.getIdEstudiante() });
+        modeloTabla.setRowCount(0);
+        ArrayList<Curso> cursos = (ArrayList<Curso>) controladorCurso.listarCursos();
+        for (Curso c : cursos) {
+            modeloTabla.addRow(new Object[]{
+                c.getIdCurso(),
+                c.getNombreCurso(),
+                c.getNombreProfesor() + " (" + c.getMateriaProfesor() + ")",
+                c.getNombreEstudiante()
+            });
         }
     }
 
@@ -125,49 +143,44 @@ public class VistaCurso extends JFrame {
             JOptionPane.showMessageDialog(this, "Seleccione un curso para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        try {
-            String curso = txtCurso.getText().trim();
-            int id_profesor = Integer.parseInt(txtIdProfesor.getText().trim());
-            int id_estudiante = Integer.parseInt(txtIdEstudiante.getText().trim());
-            if (curso.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre del curso no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            boolean exito = controlador.actualizarCurso(idSeleccionado, curso, id_profesor, id_estudiante);
-            if (exito) {
-                JOptionPane.showMessageDialog(this, "Curso actualizado exitosamente.");
-                limpiarCampos();
-                listarCursos();
-                idSeleccionado = -1; // Resetear selección
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al actualizar el curso.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "ID Profesor y ID Estudiante deben ser números válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        String nombreCurso = txtCurso.getText().trim();
+        Profesor profesor = (Profesor) comboProfesor.getSelectedItem();
+        Estudiante estudiante = (Estudiante) comboEstudiante.getSelectedItem();
+
+        boolean exito = controladorCurso.actualizarCurso(idSeleccionado, nombreCurso, profesor.getId(), estudiante.getId());
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "Curso actualizado correctamente.");
+            limpiarCampos();
+            listarCursos();
+            idSeleccionado = -1;
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al actualizar curso.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }   
+    }
+
     private void eliminarCurso() {
         if (idSeleccionado == -1) {
             JOptionPane.showMessageDialog(this, "Seleccione un curso para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el curso seleccionado?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            boolean exito = controlador.eliminarCurso(idSeleccionado);
+
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Desea eliminar el curso?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean exito = controladorCurso.eliminarCurso(idSeleccionado);
             if (exito) {
-                JOptionPane.showMessageDialog(this, "Curso eliminado exitosamente.");
-                limpiarCampos();
+                JOptionPane.showMessageDialog(this, "Curso eliminado correctamente.");
                 listarCursos();
-                idSeleccionado = -1; // Resetear selección
+                idSeleccionado = -1;
             } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar el curso.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error al eliminar curso.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
+
     private void limpiarCampos() {
-        txtIdCurso.setText("");
         txtCurso.setText("");
-        txtIdProfesor.setText("");
-        txtIdEstudiante.setText("");
+        comboProfesor.setSelectedIndex(-1);
+        comboEstudiante.setSelectedIndex(-1);
     }
 }

@@ -35,4 +35,8 @@ public class Estudiante {
     public void setEdad(int edad) {
         this.edad = edad;
     }
+    @Override
+    public String toString() {
+        return nombre + " - Id: " + id_estudiante ;
+    }
 }

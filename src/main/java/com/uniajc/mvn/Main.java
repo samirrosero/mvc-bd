@@ -23,7 +23,7 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Error al conectar con la base de datos: " + e.getMessage());
             e.printStackTrace();
             return;
-        }
+        } 
 
         // Abre el menú principal
         SwingUtilities.invokeLater(() -> {
