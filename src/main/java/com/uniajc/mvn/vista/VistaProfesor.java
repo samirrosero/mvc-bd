@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.uniajc.mvn.vista;
 
 import javax.swing.*;
@@ -102,3 +103,5 @@ public class VistaProfesor extends JFrame {
         tabla.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
     }
 }
+=======
+>>>>>>> 159fcaad578f75ea199ca3b3495bdc7189db1f40

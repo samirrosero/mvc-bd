@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.uniajc.mvn.controlador;
 
 import java.util.ArrayList;
@@ -33,3 +34,5 @@ public class ControladorProfesor {
     }
     
 }
+=======
+>>>>>>> 159fcaad578f75ea199ca3b3495bdc7189db1f40

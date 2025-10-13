@@ -1,11 +1,5 @@
 package com.uniajc.mvn.modelo;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.sql.Statement;
-import java.util.List;
 
 public class Profesor {
     private int id_Profesor;
@@ -49,6 +43,7 @@ public class Profesor {
     public void setCorreoElectronico(String correo_electronico) {
         this.correo_electronico = correo_electronico;
     }
+<<<<<<< HEAD
 
    // INSERT
     public static void insertarProfesor(Profesor profesor) {
@@ -124,4 +119,6 @@ public class Profesor {
 
     return profesores;
   }
+=======
+>>>>>>> 159fcaad578f75ea199ca3b3495bdc7189db1f40
 }
