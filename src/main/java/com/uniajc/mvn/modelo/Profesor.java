@@ -44,4 +44,9 @@ public class Profesor {
         this.correo_electronico = correo_electronico;
     }
 
+    @Override
+    public String toString() {
+        return nombre + " (" + materia + " " + correo_electronico + ")";
+    }
+
 }

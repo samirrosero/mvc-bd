@@ -1,39 +1,44 @@
 package com.uniajc.mvn.modelo;
 
 public class Curso {
-    private int id_curso;
-    private String curso;
-    private int id_profesor;
-    private int id_estudiante;
+    private int idCurso;
+    private String nombreCurso;
+    private int idEstudiante;
+    private int idProfesor;
+    private String nombreProfesor;
+    private String materiaProfesor;
+    private String nombreEstudiante;
 
-    public Curso(int id_curso, String curso, int id_profesor, int id_estudiante) {
-        this.id_curso = id_curso;
-        this.curso = curso;
-        this.id_profesor = id_profesor;
-        this.id_estudiante = id_estudiante;
+    public Curso(int idCurso, String nombreCurso, int idEstudiante, int idProfesor) {
+        this.idCurso = idCurso;
+        this.nombreCurso = nombreCurso;
+        this.idEstudiante = idEstudiante;
+        this.idProfesor = idProfesor;
     }
-    public int getIdCurso() {
-        return this.id_curso;
-    }   
-    public void setIdCurso(int id_curso) {
-        this.id_curso = id_curso;
-    }
-    public String getCurso() {
-        return this.curso;
-    }
-    public void setCurso(String curso) {
-        this.curso = curso;
-    }
-    public int getIdProfesor() {
-        return this.id_profesor;
-    }
-    public void setIdProfesor(int id_profesor) {
-        this.id_profesor = id_profesor;
-    }
-    public int getIdEstudiante() {
-        return this.id_estudiante;
-    }
-    public void setIdEstudiante(int id_estudiante) {
-        this.id_estudiante = id_estudiante;
+
+    public int getIdCurso() { return idCurso; }
+    public void setIdCurso(int idCurso) { this.idCurso = idCurso; }
+
+    public String getNombreCurso() { return nombreCurso; }
+    public void setNombreCurso(String nombreCurso) { this.nombreCurso = nombreCurso; }
+
+    public int getIdEstudiante() { return idEstudiante; }
+    public void setIdEstudiante(int idEstudiante) { this.idEstudiante = idEstudiante; }
+
+    public int getIdProfesor() { return idProfesor; }
+    public void setIdProfesor(int idProfesor) { this.idProfesor = idProfesor; }
+
+    public String getNombreProfesor() { return nombreProfesor; }
+    public void setNombreProfesor(String nombreProfesor) { this.nombreProfesor = nombreProfesor; }
+
+    public String getMateriaProfesor() { return materiaProfesor; }
+    public void setMateriaProfesor(String materiaProfesor) { this.materiaProfesor = materiaProfesor; }
+
+    public String getNombreEstudiante() { return nombreEstudiante; }
+    public void setNombreEstudiante(String nombreEstudiante) { this.nombreEstudiante = nombreEstudiante; }
+
+    @Override
+    public String toString() {
+        return nombreCurso;
     }
 }
