@@ -1,26 +1,30 @@
 package com.uniajc.mvn.modelo;
-
-import java.sql.Connection;
+ 
+// conexion a base de datos
 import java.sql.DriverManager;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import java.io.FileInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.io.FileNotFoundException;
 public class ConexionDatabase {
-
-    public static Connection getConnection() throws SQLException {
-        Properties properties = new Properties();
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            properties.load(new FileInputStream(new File("config.properties")));
-
-            String url = properties.getProperty("URL");
-            String user = properties.getProperty("USER");
-            String password = properties.getProperty("PASSWORD");
-
+    private static Connection connection;
+ 
+    public static Connection getConnection() {
+        System.out.println("intentando conectar...");
+        if (connection == null) {
+            Properties properties = new Properties();
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                properties.load(new FileInputStream(new File("config.properties")));
+                // variables de conexion
+                String url = properties.getProperty("URL").toString();
+                String user = properties.getProperty("USER").toString();
+                String password = properties.getProperty("PASSWORD").toString();
+ 
                 // ESTABLECER LA CONEXION
                 connection = DriverManager.getConnection(url, user, password);
                 System.out.println("Conexion exitosa a la base de datos");
@@ -36,7 +40,7 @@ public class ConexionDatabase {
         }
         return connection;
     }
-
+ 
         public static Statement getInstance() {
         try {
             return getConnection().createStatement();
@@ -45,7 +49,7 @@ public class ConexionDatabase {
             return null;
         }
     }
-
+ 
     public static void closeConnection() {
         if (connection != null) {
             try {
@@ -56,5 +60,6 @@ public class ConexionDatabase {
                 }
             }
         }
-
+ 
 }
+ 
