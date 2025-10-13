@@ -1,5 +1,8 @@
 # Sistema de Gestión Académica
 
+# Integrantes
+## Samir Rosero y Valeri Solis
+
 ## Descripción
 
 Este es un proyecto de escritorio desarrollado en Java con Swing que implementa el patrón de diseño Modelo-Vista-Controlador (MVC). La aplicación permite gestionar entidades académicas como Estudiantes, Profesores y Cursos, interactuando con una base de datos MySQL.
