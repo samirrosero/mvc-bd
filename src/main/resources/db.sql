@@ -6,16 +6,14 @@ create table estudiante (id_estudiante  int auto_increment primary key,
  edad int);
 desc estudiante;
 
-create table profesor (id_profesor int auto_increment primary key
-, id_estudiante int,
+create table profesor (id_profesor int auto_increment primary key, 
  nombre varchar (50),
  materia varchar (30),
- correo_electronico varchar (50),
- foreign key (id_estudiante) references estudiante (id_estudiante));
+ correo_electronico varchar (50));
  desc profesor;
  
  create table curso (id_curso int primary key auto_increment,
- curso int,
+ curso varchar (50),
  id_estudiante int,
  id_profesor int,
  foreign key (id_estudiante) references estudiante (id_estudiante),
@@ -24,4 +22,5 @@ create table profesor (id_profesor int auto_increment primary key
 select * from estudiante;
 select * from profesor;
 select * from curso;
+
 
