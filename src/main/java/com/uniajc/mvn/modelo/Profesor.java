@@ -8,24 +8,24 @@ import java.sql.Statement;
 import java.util.List;
 
 public class Profesor {
-    private int idProfesor;
+    private int id_Profesor;
     private String nombre;
     private String materia;
     private String correo_electronico;
 
-    public Profesor(int idProfesor, String nombre, String materia, String correo_electronico) {
-        this.idProfesor = idProfesor;
+    public Profesor(int id_Profesor, String nombre, String materia, String correo_electronico) {
+        this.id_Profesor = id_Profesor;
         this.nombre = nombre;
         this.materia = materia;
         this.correo_electronico = correo_electronico;
     }
 
-    public int getIdProfesor() {
-        return this.idProfesor;
+    public int getId() {
+        return this.id_Profesor;
     }
 
-    public void setIdProfesor(int idProfesor) {
-        this.idProfesor = idProfesor;
+    public void setId(int id_Profesor) {
+        this.id_Profesor = id_Profesor;
     }
 
     public String getNombre() {
@@ -55,7 +55,7 @@ public class Profesor {
         String sql = "INSERT INTO profesor (id_profesor, nombre, materia, correo_electronico) VALUES (?, ?, ?, ?)";
         try (Connection conexion = ConexionDatabase.getConnection();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, profesor.getIdProfesor());
+            ps.setInt(1, profesor.getId());
             ps.setString(2, profesor.getNombre());
             ps.setString(3, profesor.getMateria());
             ps.setString(4, profesor.getCorreoElectronico());
@@ -65,6 +65,8 @@ public class Profesor {
         }
     }
 
+
+
     // UPDATE
     public static void actualizarProfesor(Profesor profesor) {
         String sql = "UPDATE profesor SET nombre=?, materia=?, correo_electronico=? WHERE id_profesor=?";
@@ -73,7 +75,7 @@ public class Profesor {
             ps.setString(1, profesor.getNombre());
             ps.setString(2, profesor.getMateria());
             ps.setString(3, profesor.getCorreoElectronico());
-            ps.setInt(4, profesor.getIdProfesor());
+            ps.setInt(4, profesor.getId());
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error al actualizar profesor: " + e.getMessage());
@@ -92,45 +94,34 @@ public class Profesor {
         }
     }
 
-    // SELECT (buscar por ID)
-    public static Profesor buscarPorId(int idProfesor) {
-        String sql = "SELECT * FROM profesor WHERE id_profesor=?";
-        try (Connection conexion = ConexionDatabase.getConnection();
-             PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idProfesor);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Profesor(
-                    rs.getInt("id_profesor"),
-                    rs.getString("nombre"),
-                    rs.getString("materia"),
-                    rs.getString("correo_electronico")
-                );
-            }
-        } catch (Exception e) {
-            System.out.println("Error al buscar profesor: " + e.getMessage());
-        }
-        return null;
+    public static List<Profesor> obtenerTodosLosProfesores() {
+
+    List<Profesor> profesores = new ArrayList<>();
+
+    String sql = "SELECT id_profesor, nombre, materia, correo_electronico FROM profesor";
+
+    try {
+      Connection conexion = ConexionDatabase.getConnection();
+
+      Statement statement = conexion.createStatement();
+
+      // Ejecutar la sentencias SQL SELECT
+      ResultSet resultSet = statement.executeQuery(sql);
+
+      while (resultSet.next()) {
+        int id_profesor = resultSet.getInt("id_profesor");
+        String nombre = resultSet.getString("nombre");
+        String materia = resultSet.getString("materia");
+        String correo_electronico = resultSet.getString("correo_electronico");
+        Profesor profesor = new Profesor(id_profesor,nombre, materia, correo_electronico);
+        profesores.add(profesor);
+      }
+
+    } catch (Exception e) {
+      System.out.println("Error al insertar el profesor: " + e.getMessage());
+      e.printStackTrace();
     }
 
-    // SELECT (todos)
-    public static List<Profesor> obtenerTodosLosProfesores() {
-        List<Profesor> profesores = new ArrayList<>();
-        String sql = "SELECT * FROM profesor";
-        try (Connection conexion = ConexionDatabase.getConnection();
-             Statement st = conexion.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                profesores.add(new Profesor(
-                    rs.getInt("id_profesor"),
-                    rs.getString("nombre"),
-                    rs.getString("materia"),
-                    rs.getString("correo_electronico")
-                ));
-            }
-        } catch (Exception e) {
-            System.out.println("Error al obtener profesores: " + e.getMessage());
-        }
-        return profesores;
-    }
+    return profesores;
+  }
 }

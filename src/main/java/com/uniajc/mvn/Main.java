@@ -14,9 +14,9 @@ public class Main {
         try {
             conexion = ConexionDatabase.getConnection();
             if (conexion != null) {
-                System.out.println("✅ Conexión exitosa a la base de datos.");
+                System.out.println(" Conexión exitosa a la base de datos.");
             } else {
-                JOptionPane.showMessageDialog(null, "❌ No se pudo establecer conexión con la base de datos.");
+                JOptionPane.showMessageDialog(null, " No se pudo establecer conexión con la base de datos.");
                 return;
             }
         } catch (Exception e) {

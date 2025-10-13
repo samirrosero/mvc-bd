@@ -1,26 +1,35 @@
 package com.uniajc.mvn.controlador;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.uniajc.mvn.modelo.Profesor;
+import com.uniajc.mvn.vista.VistaProfesor;
 
 public class ControladorProfesor {
-      public void insertar(Profesor profesor) {
-        Profesor.insertarProfesor(profesor);
+    private List<Profesor> profesores;
+    private VistaProfesor vista;
+
+    public ControladorProfesor(Profesor modelo, VistaProfesor vista) {
+        this.vista = vista;
+        this.profesores = new ArrayList<Profesor>();
     }
 
-    public void actualizar(Profesor profesor) {
-        Profesor.actualizarProfesor(profesor);
+
+    public void actualizarVista() {
+        vista.mostrarDetallesProfesor(profesores);
     }
 
-    public void eliminar(int idProfesor) {
-        Profesor.eliminarProfesor(idProfesor);
+    public void agregarProfesor(Profesor profesor) {
+        this.profesores.add(profesor);
     }
-
-    public Profesor buscarPorId(int idProfesor) {
-        return Profesor.buscarPorId(idProfesor);
-    }
-
-    public List<Profesor> listarTodos() {
+    public List<Profesor> listarTodosLosProfesores() {
         return Profesor.obtenerTodosLosProfesores();
     }
+    public void actualizarProfesor(Profesor profesor) {
+        Profesor.actualizarProfesor(profesor);
+    }
+    public void eliminarProfesor(int id_profesor) {
+        Profesor.eliminarProfesor(id_profesor);
+    }
+    
 }
