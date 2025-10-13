@@ -89,7 +89,7 @@ public class VistaCurso extends JFrame {
             }
         });
 
-    }
+    } // hola
     private void agregarCurso() {
         try {
             String curso = txtCurso.getText().trim();
