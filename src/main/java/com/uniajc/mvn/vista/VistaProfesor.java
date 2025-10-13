@@ -7,7 +7,7 @@ import com.uniajc.mvn.modelo.Profesor;
 import com.uniajc.mvn.controlador.ControladorProfesor;
 
 public class VistaProfesor extends JFrame {
-    private JTextField txtId, txtNombre, txtEspecialidad;
+    private JTextField txtId, txtNombre, txtMateria, txtCorreoElectronico;
     private JTable tabla;
     private ControladorProfesor controlador;
 
@@ -19,23 +19,26 @@ public class VistaProfesor extends JFrame {
         setLayout(new BorderLayout(10, 10));
 
         JLabel titulo = new JLabel("Gestión de Profesores", SwingConstants.CENTER);
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         add(titulo, BorderLayout.NORTH);
 
-        JPanel panelForm = new JPanel(new GridLayout(3, 2, 10, 10));
+        JPanel panelForm = new JPanel(new GridLayout(4, 2, 10, 10));
         panelForm.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
 
         txtId = new JTextField();
         txtNombre = new JTextField();
-        txtEspecialidad = new JTextField();
+        txtMateria = new JTextField();
+        txtCorreoElectronico = new JTextField();
 
         panelForm.add(new JLabel("ID Profesor:"));
         panelForm.add(txtId);
         panelForm.add(new JLabel("Nombre:"));
         panelForm.add(txtNombre);
-        panelForm.add(new JLabel("Especialidad:"));
-        panelForm.add(txtEspecialidad);
+        panelForm.add(new JLabel("Materia:"));
+        panelForm.add(txtMateria);
+        panelForm.add(new JLabel("Correo Electronico"));
+        panelForm.add(txtCorreoElectronico);
 
         add(panelForm, BorderLayout.NORTH);
 
@@ -54,37 +57,48 @@ public class VistaProfesor extends JFrame {
         panelBotones.add(btnListar);
         add(panelBotones, BorderLayout.SOUTH);
 
-        controlador = new ControladorProfesor();
+        controlador = new ControladorProfesor(new Profesor(0, "", "", ""), this);
 
         btnAgregar.addActionListener(e -> {
-            Profesor prof = new Profesor(ABORT, getTitle(), getWarningString(), getName());
-            controlador.insertar(prof);
+            String nombre = txtNombre.getText();
+            String materia = txtMateria.getText();
+            String correo = txtCorreoElectronico.getText();
+            Profesor prof = new Profesor(0, nombre, materia, correo);
+            Profesor.insertarProfesor(prof);
+            controlador.agregarProfesor(prof);
             JOptionPane.showMessageDialog(this, "Profesor agregado correctamente");
         });
 
         btnActualizar.addActionListener(e -> {
-            Profesor prof = new Profesor(ABORT, getTitle(), getWarningString(), getName());
-            controlador.actualizar(prof);
+            int id = Integer.parseInt(txtId.getText());
+            String nombre = txtNombre.getText();
+            String materia = txtMateria.getText();
+            String correo = txtCorreoElectronico.getText();
+            Profesor prof = new Profesor(id, nombre, materia, correo);
+            controlador.actualizarProfesor(prof);
             JOptionPane.showMessageDialog(this, "Profesor actualizado correctamente");
         });
 
         btnEliminar.addActionListener(e -> {
-            controlador.eliminar(Integer.parseInt(txtId.getText()));
+            int id = Integer.parseInt(txtId.getText());
+            controlador.eliminarProfesor(id);
             JOptionPane.showMessageDialog(this, "Profesor eliminado correctamente");
         });
 
-        btnListar.addActionListener(e -> mostrarProfesores(controlador.listarTodos()));
+        btnListar.addActionListener(e -> mostrarDetallesProfesor(controlador.listarTodosLosProfesores()));
 
         setVisible(true);
     }
 
-    public void mostrarProfesores(List<Profesor> lista) {
-        String[] columnas = {"ID", "Nombre", "Especialidad"};
-        Object[][] datos = new Object[lista.size()][3];
+    public void mostrarDetallesProfesor(List<Profesor> lista) {
+        String[] columnas = {"ID","Nombre", "Materia", "Correo Electronico"};
+        Object[][] datos = new Object[lista.size()][4];
         for (int i = 0; i < lista.size(); i++) {
-            datos[i][0] = lista.get(i).getIdProfesor();
+            datos[i][0] = lista.get(i).getId();
             datos[i][1] = lista.get(i).getNombre();
-            datos[i][2] = lista.get(i).getMateria();}
+            datos[i][2] = lista.get(i).getMateria();
+            datos[i][3] = lista.get(i).getCorreoElectronico();
+        }
         tabla.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
     }
 }
