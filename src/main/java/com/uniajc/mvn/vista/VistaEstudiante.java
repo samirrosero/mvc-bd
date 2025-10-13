@@ -53,10 +53,12 @@ public class VistaEstudiante extends JFrame {
         JScrollPane scroll = new JScrollPane(tabla);
 
         // Layout general
-        setLayout(new BorderLayout());
-        add(panelForm, BorderLayout.NORTH);
-        add(panelBotones, BorderLayout.CENTER);
-        add(scroll, BorderLayout.SOUTH);
+        JPanel panelPrincipal = new JPanel ();
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
+        panelPrincipal.add(panelForm);
+        panelPrincipal.add(panelBotones);
+        panelPrincipal.add(scroll);
+        add(panelPrincipal, BorderLayout.CENTER);
 
         // Eventos
         btnAgregar.addActionListener(e -> agregarEstudiante());
