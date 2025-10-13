@@ -1,102 +1,156 @@
 package com.uniajc.mvn.vista;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
+import com.uniajc.mvn.controlador.EstudianteController;
 import com.uniajc.mvn.modelo.Estudiante;
-import com.uniajc.mvn.controlador.ControladorEstudiante;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
 
 public class VistaEstudiante extends JFrame {
-    private JTextField txtNombre, txtEdad, txtId;
+    private EstudianteController controller;
+    private JTextField txtNombre, txtEdad;
     private JTable tabla;
-    private ControladorEstudiante controlador;
+    private DefaultTableModel modeloTabla;
+    private int idSeleccionado = -1; // Guardará el ID del estudiante seleccionado
 
     public VistaEstudiante() {
+        controller = new EstudianteController();
         setTitle("Gestión de Estudiantes");
-        setSize(650, 450);
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
 
-        JLabel titulo = new JLabel("Gestión de Estudiantes", SwingConstants.CENTER);
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titulo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        add(titulo, BorderLayout.NORTH);
-
-        // Panel de formulario
-        JPanel panelForm = new JPanel(new GridLayout(3, 2, 10, 10));
-        panelForm.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
-
-        txtId = new JTextField();
-        txtNombre = new JTextField();
-        txtEdad = new JTextField();
-
-        panelForm.add(new JLabel("ID Estudiante:"));
-        panelForm.add(txtId);
+        // Panel superior de formulario
+        JPanel panelForm = new JPanel(new GridLayout(2, 2, 5, 5));
         panelForm.add(new JLabel("Nombre:"));
+        txtNombre = new JTextField();
         panelForm.add(txtNombre);
         panelForm.add(new JLabel("Edad:"));
+        txtEdad = new JTextField();
         panelForm.add(txtEdad);
 
-        add(panelForm, BorderLayout.NORTH);
-
-        // Tabla
-        tabla = new JTable();
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
-
-        // Botones
-        JPanel panelBotones = new JPanel(new FlowLayout());
+        // Panel de botones
+        JPanel panelBotones = new JPanel();
         JButton btnAgregar = new JButton("Agregar");
         JButton btnActualizar = new JButton("Actualizar");
         JButton btnEliminar = new JButton("Eliminar");
         JButton btnListar = new JButton("Listar");
-
         panelBotones.add(btnAgregar);
         panelBotones.add(btnActualizar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnListar);
-        add(panelBotones, BorderLayout.SOUTH);
 
-        controlador = new ControladorEstudiante(new Estudiante(0, "", 0), this);
+        // Tabla
+        modeloTabla = new DefaultTableModel(new String[]{"ID", "Nombre", "Edad"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // no editable
+            }
+        };
+        tabla = new JTable(modeloTabla);
+        JScrollPane scroll = new JScrollPane(tabla);
+
+        // Layout general
+        JPanel panelPrincipal = new JPanel ();
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
+        panelPrincipal.add(panelForm);
+        panelPrincipal.add(panelBotones);
+        panelPrincipal.add(scroll);
+        add(panelPrincipal, BorderLayout.CENTER);
 
         // Eventos
-        btnAgregar.addActionListener(e -> {
-            String nombre = txtNombre.getText();
-            int edad = Integer.parseInt(txtEdad.getText());
-            Estudiante est = new Estudiante(0, nombre, edad);
-             Estudiante.insertarEstudiante(est);
-            controlador.agregarEstudiante(est);
-            JOptionPane.showMessageDialog(this, "Estudiante agregado correctamente");
+        btnAgregar.addActionListener(e -> agregarEstudiante());
+        btnListar.addActionListener(e -> listarEstudiantes());
+        btnActualizar.addActionListener(e -> actualizarEstudiante());
+        btnEliminar.addActionListener(e -> eliminarEstudiante());
+
+        tabla.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int fila = tabla.getSelectedRow();
+                if (fila >= 0) {
+                    idSeleccionado = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+                    txtNombre.setText(modeloTabla.getValueAt(fila, 1).toString());
+                    txtEdad.setText(modeloTabla.getValueAt(fila, 2).toString());
+                }
+            }
         });
-
-        btnActualizar.addActionListener(e -> {
-            int id = Integer.parseInt(txtId.getText());
-            String nombre = txtNombre.getText();
-            int edad = Integer.parseInt(txtEdad.getText());
-            Estudiante est = new Estudiante(id, nombre, edad);
-            controlador.actualizarEstudiante(est);
-            JOptionPane.showMessageDialog(this, "Estudiante actualizado correctamente");
-        });
-
-        btnEliminar.addActionListener(e -> {
-            int id = Integer.parseInt(txtId.getText());
-            controlador.eliminarEstudiante(id);
-            JOptionPane.showMessageDialog(this, "Estudiante eliminado correctamente");
-        });
-
-        btnListar.addActionListener(e -> mostrarDetallesEstudiante(controlador.listarTodosLosEstudiantes()));
-
-        setVisible(true);
     }
 
-    public void mostrarDetallesEstudiante(List<Estudiante> lista) {
-        String[] columnas = {"ID", "Nombre", "Edad"};
-        Object[][] datos = new Object[lista.size()][3];
-        for (int i = 0; i < lista.size(); i++) {
-            datos[i][0] = lista.get(i).getId();
-            datos[i][1] = lista.get(i).getNombre();
-            datos[i][2] = lista.get(i).getEdad();
+    private void agregarEstudiante() {
+        try {
+            String nombre = txtNombre.getText().trim();
+            int edad = Integer.parseInt(txtEdad.getText().trim());
+            if (nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Ingrese un nombre.");
+                return;
+            }
+            if (controller.agregarEstudiante(nombre, edad)) {
+                JOptionPane.showMessageDialog(this, "Estudiante agregado correctamente.");
+                limpiarCampos();
+                listarEstudiantes();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al agregar estudiante.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Datos inválidos: " + e.getMessage());
         }
-        tabla.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
+    }
+
+    private void listarEstudiantes() {
+        modeloTabla.setRowCount(0);
+        ArrayList<Estudiante> lista = controller.listarEstudiantes();
+        for (Estudiante est : lista) {
+            modeloTabla.addRow(new Object[]{est.getId(), est.getNombre(), est.getEdad()});
+        }
+    }
+
+    private void actualizarEstudiante() {
+        if (idSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un estudiante de la tabla.");
+            return;
+        }
+        try {
+            String nombre = txtNombre.getText().trim();
+            int edad = Integer.parseInt(txtEdad.getText().trim());
+            if (controller.actualizarEstudiante(idSeleccionado, nombre, edad)) {
+                JOptionPane.showMessageDialog(this, "Estudiante actualizado.");
+                limpiarCampos();
+                listarEstudiantes();
+                idSeleccionado = -1;
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al actualizar estudiante.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Datos inválidos.");
+        }
+    }
+
+    private void eliminarEstudiante() {
+        if (idSeleccionado == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un estudiante para eliminar.");
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar este estudiante?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (controller.eliminarEstudiante(idSeleccionado)) {
+                JOptionPane.showMessageDialog(this, "Estudiante eliminado.");
+                limpiarCampos();
+                listarEstudiantes();
+                idSeleccionado = -1;
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar estudiante.");
+            }
+        }
+    }
+
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        txtEdad.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new VistaEstudiante().setVisible(true));
     }
 }
