@@ -43,4 +43,5 @@ public class Profesor {
     public void setCorreoElectronico(String correo_electronico) {
         this.correo_electronico = correo_electronico;
     }
+
 }

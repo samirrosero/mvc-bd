@@ -1,5 +1,5 @@
 package com.uniajc.mvn.modelo;
-
+ 
 // conexion a base de datos
 import java.sql.DriverManager;
 import java.sql.Connection;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 public class ConexionDatabase {
     private static Connection connection;
-
+ 
     public static Connection getConnection() {
         System.out.println("intentando conectar...");
         if (connection == null) {
@@ -24,7 +24,7 @@ public class ConexionDatabase {
                 String url = properties.getProperty("URL").toString();
                 String user = properties.getProperty("USER").toString();
                 String password = properties.getProperty("PASSWORD").toString();
-
+ 
                 // ESTABLECER LA CONEXION
                 connection = DriverManager.getConnection(url, user, password);
                 System.out.println("Conexion exitosa a la base de datos");
@@ -40,7 +40,7 @@ public class ConexionDatabase {
         }
         return connection;
     }
-
+ 
         public static Statement getInstance() {
         try {
             return getConnection().createStatement();
@@ -49,7 +49,7 @@ public class ConexionDatabase {
             return null;
         }
     }
-
+ 
     public static void closeConnection() {
         if (connection != null) {
             try {
@@ -60,5 +60,6 @@ public class ConexionDatabase {
                 }
             }
         }
-
+ 
 }
+ 
