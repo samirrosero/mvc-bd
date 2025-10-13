@@ -45,12 +45,9 @@ public class Curso {
     public static void insertarCurso(Curso curso) {
 
         String sql = "INSERT INTO curso (id_curso, curso, id_profesor, id_estudiante) VALUES (?, ?, ?, ?)";
-    
         try {
           Connection conexion = ConexionDatabase.getConnection();
-    
           PreparedStatement preparedStatement = conexion.prepareStatement(sql);
-    
           preparedStatement.setInt(1, curso.getIdCurso());
           preparedStatement.setString(2, curso.getCurso());
           preparedStatement.setInt(3, curso.getIdProfesor());

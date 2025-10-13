@@ -13,7 +13,6 @@ public class ControladorCurso {
     public ControladorCurso(Curso modelo, VistaCurso vista) {
         this.vista = vista;
         this.curso = new ArrayList<Curso>();
-
     }
     public void actualizarVista() {
         vista.mostrarDetallesCurso(curso);
@@ -32,5 +31,7 @@ public class ControladorCurso {
     public void eliminarCurso(int id_curso) {
         Curso.eliminarCurso(id_curso);
     }
+
+
 
 }
