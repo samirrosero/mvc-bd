@@ -1,65 +1,62 @@
 package com.uniajc.mvn.modelo;
- 
-// conexion a base de datos
-import java.sql.DriverManager;
+
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+
 public class ConexionDatabase {
-    private static Connection connection;
- 
-    public static Connection getConnection() {
-        System.out.println("intentando conectar...");
-        if (connection == null) {
-            Properties properties = new Properties();
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                properties.load(new FileInputStream(new File("config.properties")));
-                // variables de conexion
-                String url = properties.getProperty("URL").toString();
-                String user = properties.getProperty("USER").toString();
-                String password = properties.getProperty("PASSWORD").toString();
- 
-                // ESTABLECER LA CONEXION
-                connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Conexion exitosa a la base de datos");
-            } catch (ClassNotFoundException e) {
-                System.out.println("Error al cargar el driver de MySQL: " + e.getMessage());
-            } catch (SQLException e) {
-                System.out.println("Error al conectar a la base de datos: " + e.getMessage());
-            } catch (FileNotFoundException e) {
-               // System.out.println("Archivo de configuracion no encontrado: " + e.getMessage());
-            } catch (IOException e) {
-                System.out.println("Error al leer el archivo de configuracion: " + e.getMessage());
+
+    private static ConexionDatabase instance;
+    private Connection connection;
+
+    private ConexionDatabase() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Properties props = new Properties();
+            props.load(new FileInputStream("config.properties"));
+
+            String url = props.getProperty("URL");
+            String user = props.getProperty("USER");
+            String password = props.getProperty("PASSWORD");
+
+            connection = DriverManager.getConnection(url, user, password);
+            System.out.println("✅ Conexión establecida correctamente a la base de datos.");
+        } catch (Exception e) {
+            System.err.println("❌ Error al conectar con la base de datos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static synchronized ConexionDatabase getInstance() {
+        if (instance == null) {
+            instance = new ConexionDatabase();
+        }
+        return instance;
+    }
+
+    public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                System.out.println("⚠️ Conexión cerrada, reintentando...");
+                instance = new ConexionDatabase();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return connection;
     }
- 
-        public static Statement getInstance() {
+
+    public void closeConnection() {
         try {
-            return getConnection().createStatement();
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("🔌 Conexión cerrada correctamente.");
+            }
         } catch (SQLException e) {
-            System.out.println("Error al crear el Statement: " + e.getMessage());
-            return null;
+            System.err.println("❌ Error al cerrar la conexión: " + e.getMessage());
         }
     }
- 
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Conexion cerrada");
-                } catch (SQLException e) {
-                    System.out.println("Error al cerrar la conexion: " + e.getMessage());
-                }
-            }
-        }
- 
 }
- 
