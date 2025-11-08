@@ -2,21 +2,25 @@
 
 ## Descripción
 
-Este es un proyecto de escritorio desarrollado en Java con Swing que implementa el patrón de diseño Modelo-Vista-Controlador (MVC). La aplicación permite gestionar entidades académicas como Estudiantes, Profesores y Cursos, interactuando con una base de datos MySQL.
+Este es un proyecto de escritorio desarrollado en **Java con Swing** que implementa el patrón de diseño **Modelo-Vista-Controlador (MVC)**. La aplicación está diseñada para la gestión integral de información académica, permitiendo administrar estudiantes, cursos, calificaciones y asistencias, todo ello interactuando con una base de datos **MySQL**.
 
 El proyecto está construido con Maven para la gestión de dependencias y del ciclo de vida de la compilación.
 
 ## Características
 
-- **Gestión de Estudiantes**: Permite agregar, actualizar, eliminar y listar estudiantes.
-- **Gestión de Profesores**: Permite agregar, actualizar, eliminar y listar profesores.
-- **Gestión de Cursos**: Permite asignar profesores y estudiantes a cursos, así como realizar operaciones CRUD sobre ellos.
+- **Gestión de Estudiantes**: Operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para los estudiantes.
+- **Gestión de Cursos**: Operaciones CRUD para los cursos, con asignación de docentes y periodos académicos.
+- **Registro de Calificaciones**: Permite registrar y gestionar las notas de los estudiantes por componentes de evaluación.
+- **Control de Asistencia**: Permite registrar la asistencia de los estudiantes a cada clase (`presente`, `ausente`, `tardanza`).
+- **Generación de Reportes**:
+  - Cálculo de la nota final de un estudiante en un curso.
+  - Cálculo del porcentaje de asistencia.
 - **Interfaz Gráfica de Usuario (GUI)**: Desarrollada con Java Swing para una interacción intuitiva.
-- **Conexión a Base de Datos**: Configuración de la conexión a MySQL a través de un archivo externo `config.properties`.
+- **Conexión a Base de Datos**: Configuración centralizada para la conexión a MySQL.
 
 ## Tecnologías Utilizadas
 
-- **Lenguaje**: Java 17
+- **Lenguaje**: Java (JDK 17 o superior)
 - **Librería Gráfica**: Java Swing
 - **Gestor de Dependencias**: Apache Maven
 - **Base de Datos**: MySQL
@@ -24,41 +28,49 @@ El proyecto está construido con Maven para la gestión de dependencias y del ci
 
 ## Prerrequisitos
 
-- **JDK 17** o superior.
-- **Apache Maven** 3.6 o superior.
+- **JDK 17** o una versión superior.
+- **Apache Maven** 3.6 o una versión superior.
 - Un servidor de **MySQL** en ejecución.
 
 ## Configuración del Proyecto
 
 ### 1. Base de Datos
 
-Primero, crea una base de datos en tu servidor MySQL. Puedes usar el siguiente script SQL para crear la base de datos y las tablas necesarias.
+Ejecuta el script ubicado en `src/main/resources/db.sql` en tu servidor MySQL. Este script creará la base de datos `control_academico`, todas las tablas necesarias e insertará algunos datos de ejemplo para que puedas probar la aplicación.
 
 ```sql
-CREATE DATABASE IF NOT EXISTS practica_mvn_mvc_bd;
-USE practica_mvn_mvc_bd;
+-- Creación de la base de datos
+CREATE DATABASE IF NOT EXISTS control_academico;
+USE control_academico;
 
-CREATE TABLE estudiante (
-    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    edad INT
-);
+-- Creación de tablas (estudiantes, docentes, cursos, calificaciones, etc.)
+-- ... (script completo en db.sql)
 
-CREATE TABLE profesor (
-    id_profesor INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    materia VARCHAR(255),
-    correo_electronico VARCHAR(255) UNIQUE
-);
+-- Inserción de datos de ejemplo
+-- ... (script completo en db.sql)
+```
 
-CREATE TABLE curso (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_curso VARCHAR(255) NOT NULL,
-    id_profesor INT,
-    id_estudiante INT,
-    FOREIGN KEY (id_profesor) REFERENCES profesor(id_profesor) ON DELETE SET NULL,
-    FOREIGN KEY (id_estudiante) REFERENCES estudiante(id_estudiante) ON DELETE CASCADE
-);
+### 2. Procedimientos Almacenados (Opcional pero recomendado)
+
+El proyecto está preparado para usar procedimientos almacenados que calculan reportes complejos. Aunque el código Java (`ReportesDao.java`) ya incluye las llamadas, necesitas crear estos procedimientos en tu base de datos.
+
+```sql
+-- Ejemplo de cómo podrían ser los procedimientos (debes implementarlos)
+DELIMITER $$
+CREATE PROCEDURE sp_calcular_nota_final(IN p_estudiante_id INT, IN p_curso_id INT)
+BEGIN
+    -- Lógica para calcular la nota final
+    -- ...
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_calcular_asistencia(IN p_estudiante_id INT, IN p_curso_id INT)
+BEGIN
+    -- Lógica para calcular el porcentaje de asistencia
+    -- ...
+END$$
+DELIMITER ;
 ```
 
 ### 2. Archivo de Configuración
